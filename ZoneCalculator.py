@@ -1,16 +1,11 @@
 from __future__ import print_function
 
 from fractions import Fraction
+
 import Credentials
-
-# Manual before running the code
-# Step 1: change the service_account_file to company one
-# Step 2: Change the ID of three spreadsheets
-# Step 3: Change the name of the sheet to sheet1 for all of three spreadsheets
-
+import helperFunctions
 
 # Step 2: Access the spreadsheet tab and get the values inside each spreadsheet
-
 
 # Get the name of the input and output sheet
 input_recipe_sheet = input("Enter the input name worksheet: ")
@@ -19,38 +14,11 @@ output_recipe_sheet = input("Enter the output name worksheet: ")
 rangeInputS = input_recipe_sheet + "!A1:C5"
 rangeOutputS = output_recipe_sheet + "!A1"
 
-
 # Create output sheet with input recipe name
 
 # Add new worksheet into spreadSheet with ID: outputListID and title: sheet_name
-def add_sheets(outputListID, sheet_name):
-    try:
-        request_body = {
-            'requests': [{
-                'addSheet': {
-                    'properties': {
-                        'title': sheet_name,
-                        'tabColor': {
-                            'red': 0.44,
-                            'green': 0.99,
-                            'blue': 0.50
-                        }
-                    }
-                }
-            }]
-        }
 
-        response = Credentials.sheet.batchUpdate(
-            spreadsheetId=outputListID,
-            body=request_body
-        ).execute()
-
-        return response
-    except Exception as e:
-        print(e)
-
-
-add_sheets(Credentials.outputListSheet_ID, output_recipe_sheet)
+helperFunctions.add_sheets(Credentials.outputListSheet_ID, output_recipe_sheet)
 
 input_recipe = Credentials.sheet.values().get(spreadsheetId=Credentials.inputListSheet_ID,
                                               range=rangeInputS).execute()
@@ -66,34 +34,20 @@ headerList = [["Name", "Zone Blocks", "Needed", "calories", "carbohydrates", "fa
 
 # Step 4: Append the inputted units, name of food and zone blocks into array
 
-inputted_units = []
-inputted_names = []
-inputted_zoneblocks = []
+inputted_zoneblocks = helperFunctions.recipe(values_input_recipe).ingredients_blocks
+inputted_units = helperFunctions.recipe(values_input_recipe).ingredients_units
 
-for i in range(1, len(values_input_recipe)):
-    inputted_units.append(values_input_recipe[i][2])
-    inputted_names.append(values_input_recipe[i][0])
-    inputted_zoneblocks.append(values_input_recipe[i][1])
-
+inputted_names = [values_input_recipe[i][0] for i in range(1, len(values_input_recipe))]
 # Step 5: Find the index row of the inputted name of foods
 
 index_inputted_food = []
 
-# Get the number of inputted name of food
-foodNameLength = len(inputted_names)
-
-counter = 0
-
-for i, x in enumerate(values_ingredient_list):
-    if inputted_names[counter] in x:
-        index_inputted_food.append(i)
-        counter += 1
-        if counter == len(inputted_names): # Break if all the inputted food checked
-            break
+helperFunctions.getInputIndex(inputted_names, values_ingredient_list, index_inputted_food)
 
 # Step 6: Create variables for storing the results
 
 # Store the column of each property inside the ingredient list
+
 gram_column = 2
 ml_column = 3
 tablespoon_column = 4
@@ -123,6 +77,7 @@ total_results_output = []
 total_results_output.extend(headerList)
 
 # Variables to calculate the sum of each property
+
 total_calories = 0
 total_carbs = 0
 total_fats = 0
@@ -130,66 +85,14 @@ total_protein = 0
 total_sodium = 0
 total_sugar = 0
 
+# Array to store all the property
+
+
 # Step 7: Calculate
 for i in range(len(values_input_recipe) - 1):
     # Array stores calculated results for each food
 
     eachFoodResult = []
-
-    # Check the inputted unit and set the column
-
-    if inputted_units[i] == "grams":
-        units_column = gram_column
-    elif inputted_units[i] == "mL":
-        units_column = ml_column
-    elif inputted_units[i] == "tbsp":
-        units_column = tablespoon_column
-    elif inputted_units[i] == "tsp":
-        units_column = teaspoon_column
-    elif inputted_units[i] == "cups":
-        units_column = cups_column
-    elif inputted_units[i] == "oz":
-        units_column = oz_column
-    else:
-        units_column = pieces_column
-
-    # Conver "," to "."
-    zoneblocks = inputted_zoneblocks[i].replace(",", ".")
-    units_value = values_ingredient_list[index_inputted_food[i]][units_column].replace(",", ".")
-    calories_value = values_ingredient_list[index_inputted_food[i]][calories_column].replace(",", ".")
-    carbs_value = values_ingredient_list[index_inputted_food[i]][carbs_column].replace(",", ".")
-    fats_value = values_ingredient_list[index_inputted_food[i]][fats_column].replace(",", ".")
-    protein_value = values_ingredient_list[index_inputted_food[i]][protein_column].replace(",", ".")
-    sodium_value = values_ingredient_list[index_inputted_food[i]][sodium_column].replace(",", ".")
-    sugar_value = values_ingredient_list[index_inputted_food[i]][sugar_column].replace(",", ".")
-
-    # Calculate for each property
-    if inputted_units[i] == "tbsp" or inputted_units[i] == "tsp":
-        needed = str(Fraction(float(zoneblocks) * float(units_value)).limit_denominator(10)) + " tbsp"  # To convert
-        # into fraction for table spoon and teaspoon
-    elif inputted_units[i] == "tsp":
-        needed = str(Fraction(float(zoneblocks) * float(units_value)).limit_denominator(10)) + " tsp"
-    else:
-        needed = str(round(float(zoneblocks) * float(units_value), 0)) + " " + str(inputted_units[i])
-
-    calories = round(float(zoneblocks) * float(calories_value))
-    total_calories += calories
-    carbs = round(float(zoneblocks) * float(carbs_value))
-    total_carbs += carbs
-    fats = round(float(zoneblocks) * float(fats_value))
-    total_fats += fats
-    protein = round(float(zoneblocks) * float(protein_value))
-    total_protein += protein
-    sodium = round(float(zoneblocks) * float(sodium_value))
-    total_sodium += sodium
-    sugar = round(float(zoneblocks) * float(sugar_value))
-    total_sugar += sugar
-
-    # Append to array each food for printing out result of each food
-    eachFoodResult.extend(
-        [[inputted_names[i], zoneblocks, needed, calories, carbs, fats, protein, sodium, sugar]])
-
-    total_results_output.extend(eachFoodResult)
 
     # Reset values of each food's properties to calculate the next inputted food
     needed = 0
@@ -200,9 +103,61 @@ for i in range(len(values_input_recipe) - 1):
     sodium = 0
     sugar = 0
 
-    # Append total result for each properties
+    # Check the inputted unit and set the column
 
-#
+    if inputted_units[inputted_names[i]] == "grams":
+        units_column = gram_column
+    elif inputted_units[inputted_names[i]] == "mL":
+        units_column = ml_column
+    elif inputted_units[inputted_names[i]] == "tbsp":
+        units_column = tablespoon_column
+    elif inputted_units[inputted_names[i]] == "tsp":
+        units_column = teaspoon_column
+    elif inputted_units[inputted_names[i]] == "cups":
+        units_column = cups_column
+    elif inputted_units[inputted_names[i]] == "oz":
+        units_column = oz_column
+    else:
+        units_column = pieces_column
+
+    # Get the value of each property inside the info list
+
+    units_value = values_ingredient_list[index_inputted_food[i]][units_column]
+    calories_value = values_ingredient_list[index_inputted_food[i]][calories_column]
+    carbs_value = values_ingredient_list[index_inputted_food[i]][carbs_column]
+    fats_value = values_ingredient_list[index_inputted_food[i]][fats_column]
+    protein_value = values_ingredient_list[index_inputted_food[i]][protein_column]
+    sodium_value = values_ingredient_list[index_inputted_food[i]][sodium_column]
+    sugar_value = values_ingredient_list[index_inputted_food[i]][sugar_column]
+
+    # Calculate for each property
+    if inputted_units[inputted_names[i]] == "tbsp" or inputted_units[inputted_names[i]] == "tsp":
+        needed = str(Fraction(float(inputted_zoneblocks[inputted_names[i]]) * float(units_value)).
+                     limit_denominator(10)) + " tbsp"  # To convert
+        # into fraction for table spoon and teaspoon
+    elif inputted_units[inputted_names[i]] == "tsp":
+        needed = str(Fraction(float(inputted_zoneblocks[inputted_names[i]]) * float(units_value)).
+                     limit_denominator(10)) + " tsp"
+    else:
+        needed = str(round(float(inputted_zoneblocks[inputted_names[i]]) * float(units_value), 0)) \
+                 + " " + str(inputted_units[inputted_names[i]])
+
+    propertyArray = [calories, carbs, fats, protein, sodium, sugar]
+    property_valueArray = [calories_value, carbs_value, fats_value, protein_value, sodium_value, sugar_value]
+    totalPropertyArray = [total_calories, total_carbs, total_fats, total_protein, total_sodium, total_sugar]
+
+    for j in range(len(propertyArray)):
+        propertyArray[j] = round(float(inputted_zoneblocks[inputted_names[i]]) * float(property_valueArray[j]))
+        totalPropertyArray[j] += propertyArray[j]
+
+    # Append to array each food for printing out result of each food
+    eachFoodResult.extend(
+        [[inputted_names[i], inputted_zoneblocks[inputted_names[i]], needed, calories, carbs, fats, protein, sodium,
+          sugar]])
+
+    total_results_output.extend(eachFoodResult)
+
+# Add restrict
 vegan = "yes"
 vegetarian = "yes"
 gluten_free = "yes"
@@ -248,4 +203,5 @@ total_results_output.extend(
     [[sugar_free, vegan, vegetarian, gluten_free, lacoste_free, paleo, whole_30, zone, zone_Unfavorable]])
 
 request_1 = Credentials.sheet.values().update(spreadsheetId=Credentials.outputListSheet_ID, range=rangeOutputS,
-                                              valueInputOption="USER_ENTERED", body={"values": total_results_output}).execute()
+                                              valueInputOption="USER_ENTERED",
+                                              body={"values": total_results_output}).execute()
