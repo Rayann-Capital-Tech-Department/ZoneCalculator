@@ -133,23 +133,28 @@ for i in range(len(values_input_recipe) - 1):
     elif values_ingredient_list[index_inputted_food[i]][dietary_restrict_col["zone-favorable"]] == "no":
         zone_Unfavorable += inputted_names[i]
 
-
+# Array to print out the total nutrians values
 totalNutriansArray = ["", "", "TOTAL"]
 for nutrition in total_nutrians_values:
     totalNutriansArray.append(total_nutrians_values[nutrition])
 
 total_results_output.extend([totalNutriansArray])
+
+# Adding a new empty row to separate the content
 total_results_output.extend([[""]])
 
-restrictionArray = []
+# Array to print out the dietary restriction 
+restrictionArray = ["sugar-free"]
 for restriction in dietary_restrict_col:
     restrictionArray.append(restriction)
 
 total_results_output.extend([restrictionArray])
 
+# Append the dietary restriction facts into the total results output
 total_results_output.extend(
     [[sugar_free, vegan, vegetarian, gluten_free, lactose_free, paleo, whole_30, zone, zone_Unfavorable]])
 
+# Syntax to write out the 2D array into the google spreadsheet
 request_1 = Credentials.sheet.values().update(spreadsheetId=Credentials.outputListSheet_ID, range=rangeOutputS,
                                               valueInputOption="USER_ENTERED",
                                               body={"values": total_results_output}).execute()
