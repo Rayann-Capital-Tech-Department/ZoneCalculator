@@ -2,7 +2,7 @@
 
 ## Purpose 
   
-  **Zone Calculator** has three main purposes:
+  **Zone Calculator** has three main uses:
   
    ① Calculate the amount of ingredients needed, calories, carbonhydrates, fats, protein, sodium and sugar of each food in the recipe that the users make and based on the amount of zone blocks that they want
     
@@ -18,7 +18,7 @@
   - The input is a table with 3 columns, including:
  
     + Name of Food: The first character of the food is capitalized (it needs to be exact the same as the name of food in the ingredients data files)
-    + Number of Zone Blocks: Can be either natural or float numbers
+    + Number of Zone Blocks: Can be either natural or float numbers. If it is float, use `.` instead of `,`.
     + Units: 
     
   - The number of rows is based on the recipe of the users 
@@ -30,5 +30,13 @@ Potato - boiled|2|g
 Carrots|1|cups
 Olive oil|5|teaspoon
 
-
 ### Output
+The output of the zone calculations will be display in a table. The table will dispay the input foods' name, zone blocks and nutrians; the total value of nutrians for the whole recipe and the dietary restriction.
+
+**Sample Output**
+
+Name | Zone Blocks |Needed| Calories | Carbonhydrates| fats|protein|sodium|sugar
+:---: | :---: | :---:| :---: | :---:| :---: | :---:| :---: | :---:
+Potato - boiled|2|g
+Carrots|1|cups
+Olive oil|5|teaspoon
