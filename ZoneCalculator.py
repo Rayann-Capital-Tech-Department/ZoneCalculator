@@ -55,8 +55,13 @@ dietary_restrict_col = helperFunctions.ingredientList(values_ingredient_list, 2)
 total_results_output = []
 total_results_output.extend(headerList)
 
-# Dictionary to calculate the sum of each property
+# Dietary Restriction for whole food
 
+recipe_restriction_dict = helperFunctions.ingredientList(values_ingredient_list, 2).recipe_restriction
+# Array to store the name of the diet
+recipe_restriction_array = [i for i in recipe_restriction_dict]
+zone_Unfavorable = ""
+# Dictionary to calculate the sum of each property
 total_nutrians_values = helperFunctions.total_nutrions_values(values_ingredient_list)
 
 # Step 7: Calculate
@@ -77,6 +82,8 @@ for i in range(len(values_input_recipe) - 1):
     # Get the value of each property inside the info list
 
     nutrions_values = helperFunctions.ingredientList(values_ingredient_list, index_inputted_food[i]).nutrians_values
+    dietary_values = helperFunctions.ingredientList(values_ingredient_list,
+                                                    index_inputted_food[i]).dietary_restriction_values
 
     # Calculate for each property
     if inputted_units[inputted_names[i]] == "tablespoon":
@@ -87,8 +94,6 @@ for i in range(len(values_input_recipe) - 1):
         needed = str(Fraction(float(inputted_zoneblocks[inputted_names[i]]) * float(units_value)).
                      limit_denominator(10)) + " tsp"
     else:
-        print(units_value)
-
         needed = str(round(float(inputted_zoneblocks[inputted_names[i]]) * float(units_value))) \
                  + " " + str(inputted_units[inputted_names[i]])
 
@@ -102,38 +107,17 @@ for i in range(len(values_input_recipe) - 1):
 
     total_results_output.extend([eachFoodResult])
 
-# Add restrict
-vegan = "yes"
-vegetarian = "yes"
-gluten_free = "yes"
-lactose_free = "yes"
-paleo = "yes"
-whole_30 = "yes"
-zone = "yes"
-zone_Unfavorable = ""
+    # Loop to check the dietary restriction
+    for j in recipe_restriction_array:
+        if values_ingredient_list[index_inputted_food[i]][dietary_restrict_col[j]] == "no":
+            recipe_restriction_dict[j] = "no"
+    if values_ingredient_list[index_inputted_food[i]][dietary_restrict_col["zone-favorable"]] == "no":
+        zone_Unfavorable += inputted_names[i]
 
 if total_nutrians_values["sugar"] == 0:
     sugar_free = "yes"
 else:
     sugar_free = "no"
-
-for i in range(len(values_input_recipe) - 1):
-    if values_ingredient_list[index_inputted_food[i]][dietary_restrict_col["vegan"]] == "no":
-        vegan = "no"
-    if values_ingredient_list[index_inputted_food[i]][dietary_restrict_col["vegetarian"]] == "no":
-        vegetarian = "no"
-    if values_ingredient_list[index_inputted_food[i]][dietary_restrict_col["gluten-free"]] == "no":
-        gluten_free = "no"
-    if values_ingredient_list[index_inputted_food[i]][dietary_restrict_col["lactose-free"]] == "no":
-        lactose_free = "no"
-    if values_ingredient_list[index_inputted_food[i]][dietary_restrict_col["paleo"]] == "no":
-        paleo = "no"
-    if values_ingredient_list[index_inputted_food[i]][dietary_restrict_col["whole 30"]] == "no":
-        whole_30 = "no"
-    if values_ingredient_list[index_inputted_food[i]][dietary_restrict_col["zone"]] == "no":
-        zone = "no"
-    if values_ingredient_list[index_inputted_food[i]][dietary_restrict_col["zone-favorable"]] == "no":
-        zone_Unfavorable += inputted_names[i]
 
 # Array to print out the total nutrians values
 totalNutriansArray = ["", "", "TOTAL"]
@@ -152,9 +136,14 @@ for restriction in dietary_restrict_col:
 
 total_results_output.extend([restrictionArray])
 
+# Array to print out to the recipe
+recipe_restriction = [sugar_free]
+for restriction_values in recipe_restriction_dict.values():
+    recipe_restriction.append(restriction_values)
+recipe_restriction.append(zone_Unfavorable)
+
 # Append the dietary restriction facts into the total results output
-total_results_output.extend(
-    [[sugar_free, vegan, vegetarian, gluten_free, lactose_free, paleo, whole_30, zone, zone_Unfavorable]])
+total_results_output.extend([recipe_restriction])
 
 # Syntax to write out the 2D array into the google spreadsheet
 request_1 = Credentials.sheet.values().update(spreadsheetId=Credentials.outputListSheet_ID, range=rangeOutputS,
