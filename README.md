@@ -26,9 +26,9 @@
 **Sample Input**
 Name | Zone Blocks |Units
 :---: | :---: | :---:
-potato - boiled|2|g
-carrots - cooked|1.5|g
-mushrooms - raw|1.5|g
+Potato - boiled|2|g
+Carrots|1|cups
+Olive oil|5|teaspoon
 
 
 ### Output
