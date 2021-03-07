@@ -11,7 +11,7 @@ import helperFunctions
 input_recipe_sheet = input("Enter the input name worksheet: ")
 output_recipe_sheet = input("Enter the output name worksheet: ")
 
-rangeInputS = input_recipe_sheet + "!A1:C6"
+rangeInputS = input_recipe_sheet + "!A1:C8"
 rangeOutputS = output_recipe_sheet + "!A1"
 
 # Create output sheet with input recipe name
@@ -25,7 +25,7 @@ input_recipe = Credentials.sheet.values().get(spreadsheetId=Credentials.inputLis
 values_input_recipe = input_recipe.get('values', [])
 
 ingredient_list = Credentials.sheet.values().get(spreadsheetId=Credentials.ingredientSheet_ID,
-                                                 range="sheet1!A1:AA6").execute()
+                                                 range="sheet1!A1:Z15").execute()
 values_ingredient_list = ingredient_list.get('values', [])
 
 # Step 3: Write the header for columns of output file
@@ -59,8 +59,6 @@ total_results_output.extend(headerList)
 
 total_nutrians_values = helperFunctions.total_nutrions_values(values_ingredient_list)
 
-# Array to store all the property
-
 # Step 7: Calculate
 for i in range(len(values_input_recipe) - 1):
     # Array stores calculated results for each food
@@ -73,7 +71,9 @@ for i in range(len(values_input_recipe) - 1):
         if inputted_units[inputted_names[i]] == propertyS:
             units_column += measure_col[inputted_units[inputted_names[i]]]
             break
+
     units_value = values_ingredient_list[index_inputted_food[i]][units_column]
+
     # Get the value of each property inside the info list
 
     nutrions_values = helperFunctions.ingredientList(values_ingredient_list, index_inputted_food[i]).nutrians_values
@@ -87,13 +87,15 @@ for i in range(len(values_input_recipe) - 1):
         needed = str(Fraction(float(inputted_zoneblocks[inputted_names[i]]) * float(units_value)).
                      limit_denominator(10)) + " tsp"
     else:
-        needed = str(round(float(inputted_zoneblocks[inputted_names[i]]) * float(units_value), 0)) \
+        print(units_value)
+
+        needed = str(round(float(inputted_zoneblocks[inputted_names[i]]) * float(units_value))) \
                  + " " + str(inputted_units[inputted_names[i]])
 
     eachFoodResult.append(needed)
     for nutrion in nutrions_values:
-        nutrions_values[nutrion] *= round(float(inputted_zoneblocks[inputted_names[i]]))
-        total_nutrians_values[nutrion] += nutrions_values[nutrion]
+        nutrions_values[nutrion] = round(nutrions_values[nutrion] * float(inputted_zoneblocks[inputted_names[i]]))
+        total_nutrians_values[nutrion] = round(total_nutrians_values[nutrion] + nutrions_values[nutrion])
         eachFoodResult.append(nutrions_values[nutrion])
 
     # Append to array each food for printing out result of each food
@@ -118,32 +120,32 @@ else:
 for i in range(len(values_input_recipe) - 1):
     if values_ingredient_list[index_inputted_food[i]][dietary_restrict_col["vegan"]] == "no":
         vegan = "no"
-    elif values_ingredient_list[index_inputted_food[i]][dietary_restrict_col["vegetarian"]] == "no":
+    if values_ingredient_list[index_inputted_food[i]][dietary_restrict_col["vegetarian"]] == "no":
         vegetarian = "no"
-    elif values_ingredient_list[index_inputted_food[i]][dietary_restrict_col["gluten-free"]] == "no":
+    if values_ingredient_list[index_inputted_food[i]][dietary_restrict_col["gluten-free"]] == "no":
         gluten_free = "no"
-    elif values_ingredient_list[index_inputted_food[i]][dietary_restrict_col["lactose-free"]] == "no":
+    if values_ingredient_list[index_inputted_food[i]][dietary_restrict_col["lactose-free"]] == "no":
         lactose_free = "no"
-    elif values_ingredient_list[index_inputted_food[i]][dietary_restrict_col["paleo"]] == "no":
+    if values_ingredient_list[index_inputted_food[i]][dietary_restrict_col["paleo"]] == "no":
         paleo = "no"
-    elif values_ingredient_list[index_inputted_food[i]][dietary_restrict_col["whole 30"]] == "no":
+    if values_ingredient_list[index_inputted_food[i]][dietary_restrict_col["whole 30"]] == "no":
         whole_30 = "no"
-    elif values_ingredient_list[index_inputted_food[i]][dietary_restrict_col["zone"]] == "no":
+    if values_ingredient_list[index_inputted_food[i]][dietary_restrict_col["zone"]] == "no":
         zone = "no"
-    elif values_ingredient_list[index_inputted_food[i]][dietary_restrict_col["zone-favorable"]] == "no":
+    if values_ingredient_list[index_inputted_food[i]][dietary_restrict_col["zone-favorable"]] == "no":
         zone_Unfavorable += inputted_names[i]
 
 # Array to print out the total nutrians values
 totalNutriansArray = ["", "", "TOTAL"]
 for nutrition in total_nutrians_values:
-    totalNutriansArray.append(total_nutrians_values[nutrition])
+    totalNutriansArray.append(str(total_nutrians_values[nutrition]))
 
 total_results_output.extend([totalNutriansArray])
 
 # Adding a new empty row to separate the content
 total_results_output.extend([[""]])
 
-# Array to print out the dietary restriction 
+# Array to print out the dietary restriction
 restrictionArray = ["sugar-free"]
 for restriction in dietary_restrict_col:
     restrictionArray.append(restriction)
