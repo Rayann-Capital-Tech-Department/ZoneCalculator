@@ -10,7 +10,7 @@ class recipe:
         self.ingredients_units = {}
 
         # Start at 1 to ignore the header row
-        for i in range(len(self.inputRecipe)):
+        for i in range(1, len(self.inputRecipe)):
             self.ingredients_blocks[self.inputRecipe[i][0]] = self.inputRecipe[i][1]
             self.ingredients_units[self.inputRecipe[i][0]] = self.inputRecipe[i][2]
 
@@ -58,13 +58,14 @@ def getInputIndex(inputFoodName, nutrition_info, index_inputted_food):
     # Counter is the index of food in the input recipe
     counter = 0
 
-    for i, x in enumerate(nutrition_info):
-        # If food appears in the nutrition_infor list, append the food's index row into an array to store
-        if inputFoodName[counter] in x:
-            index_inputted_food.append(i)
-            counter += 1
-            if counter == len(inputFoodName):  # Break if all the inputted food checked
-                break
+    for inputFood in inputFoodName:
+        for i, x in enumerate(nutrition_info):
+            # If food appears in the nutrition_infor list, append the food's index row into an array to store
+                if inputFood in x:
+                    index_inputted_food.append(i)
+                    counter += 1
+                    if counter == len(inputFoodName):  # Break if all the inputted food checked
+                        break
     return index_inputted_food
 
 
