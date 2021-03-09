@@ -37,6 +37,6 @@ The output of the zone calculations will be display in a table. The table will d
 
 Name | Zone Blocks |Needed| Calories | Carbonhydrates| fats|protein|sodium|sugar
 :---: | :---: | :---:| :---: | :---:| :---: | :---:| :---: | :---:
-Potato - boiled|2|g
-Carrots|1|cups
-Olive oil|5|teaspoon
+Potato - boiled|2|150 g|9|88||18|0|4|16
+Carrots|1|1 cup|38|9|0|1|65|4
+Olive oil|5|5/3 tsp|66|0|8||0|0|0
