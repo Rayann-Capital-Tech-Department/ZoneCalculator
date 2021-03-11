@@ -1,6 +1,26 @@
 import Credentials
 
 
+# Function to get the range of the data inside the documents
+def getRange(IDFiles, sheetIndex):
+    res = Credentials.service.spreadsheets().get(spreadsheetId=IDFiles, fields='sheets('
+                                                                                                     'data/rowData'
+                                                                                                     '/values'
+                                                                                                     '/userEnteredValue,'
+                                                                                                     'properties(index,'
+                                                                                                     'sheetId,'
+                                                                                                     'title))').execute()
+    sheetName = res['sheets'][sheetIndex]['properties']['title']
+    lastRow = len(res['sheets'][sheetIndex]['data'][0]['rowData'])
+    lastColumn = max([len(e['values']) for e in res['sheets'][sheetIndex]['data'][0]['rowData'] if e])
+
+    string = ""
+    while lastColumn > 0:
+        lastColumn, remainder = divmod(lastColumn - 1, 26)
+        string = chr(65 + remainder) + string
+    return "!A1:" + string + str(lastRow)
+
+
 # Store all the input information
 
 class recipe:
@@ -22,13 +42,15 @@ class ingredientList:
         self.indexFood = indexFood
         # Dictionary for getting column
         self.measurement_col = {}
-        self.nutrians_col = {}
+        self.nutrients_col = {}
         self.dietary_restriction_col = {}
+        self.recipe_restriction = {}
 
         # Dictionary for storing name of each nutrition, dietary restriction value
-        self.nutrians_values = {}
+        self.nutrients_values = {}
         self.dietary_restriction_values = {}
         self.inputFood_nutrians_values = {}
+        self.nutrientsName = []
 
         # Function to get the column of each property in the first row
         counter = 0  # Counter to check the number of
@@ -39,18 +61,21 @@ class ingredientList:
             if counter == 1:  # After the first empty column, the next columns will be measurement column
                 self.measurement_col[self.ingredient[0][i]] = i
             elif counter == 2:  # After the second empty column, the next columns will be nutrians column
-                self.nutrians_col[self.ingredient[0][i]] = i
+                self.nutrientsName.append(self.ingredient[0][i])
+                self.nutrients_col[self.ingredient[0][i]] = i
 
                 # Store the value of nutrians property of food with index row
-                self.nutrians_values[self.ingredient[0][i]] = 0
-                self.nutrians_values[self.ingredient[0][i]] += float(self.ingredient[self.indexFood][
-                                                                         self.nutrians_col[self.ingredient[0][i]]])
+                self.nutrients_values[self.ingredient[0][i]] = 0
+                self.nutrients_values[self.ingredient[0][i]] += float(self.ingredient[self.indexFood][
+                                                                         self.nutrients_col[self.ingredient[0][i]]])
 
             elif counter == 3:  # After the first empty column, the next columns will be dietary restriction column
                 self.dietary_restriction_col[self.ingredient[0][i]] = i
                 # Store the dietary restriction text into dictionary
                 self.dietary_restriction_values[self.ingredient[0][i]] = self.ingredient[self.indexFood][
                     self.dietary_restriction_col[self.ingredient[0][i]]]
+                if self.ingredient[0][i] != "zone-favorable":
+                    self.recipe_restriction[self.ingredient[0][i]] = "yes"
 
 
 # Get the index row of the input food in the ingredient list
@@ -61,11 +86,11 @@ def getInputIndex(inputFoodName, nutrition_info, index_inputted_food):
     for inputFood in inputFoodName:
         for i, x in enumerate(nutrition_info):
             # If food appears in the nutrition_infor list, append the food's index row into an array to store
-                if inputFood in x:
-                    index_inputted_food.append(i)
-                    counter += 1
-                    if counter == len(inputFoodName):  # Break if all the inputted food checked
-                        break
+            if inputFood in x:
+                index_inputted_food.append(i)
+                counter += 1
+                if counter == len(inputFoodName):  # Break if all the inputted food checked
+                    break
     return index_inputted_food
 
 
