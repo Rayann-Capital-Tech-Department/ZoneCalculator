@@ -1,15 +1,28 @@
 import Credentials
 
 
+# Function to get the index of the sheet inside the spreadsheet
+def getSheetIndex(IDFiles, sheetName):
+    sheet_metadata = Credentials.service.spreadsheets().get(spreadsheetId=IDFiles).execute()
+    sheets = sheet_metadata.get('sheets', '')
+    sheetIndex = 0
+
+    for i in sheets:
+        if i["properties"]["title"] == sheetName:
+            sheetIndex = i["properties"]["index"]
+
+    return sheetIndex
+
+
 # Function to get the range of the data inside the documents
 def getRange(IDFiles, sheetIndex):
     res = Credentials.service.spreadsheets().get(spreadsheetId=IDFiles, fields='sheets('
-                                                                                                     'data/rowData'
-                                                                                                     '/values'
-                                                                                                     '/userEnteredValue,'
-                                                                                                     'properties(index,'
-                                                                                                     'sheetId,'
-                                                                                                     'title))').execute()
+                                                                               'data/rowData'
+                                                                               '/values'
+                                                                               '/userEnteredValue,'
+                                                                               'properties(index,'
+                                                                               'sheetId,'
+                                                                               'title))').execute()
     sheetName = res['sheets'][sheetIndex]['properties']['title']
     lastRow = len(res['sheets'][sheetIndex]['data'][0]['rowData'])
     lastColumn = max([len(e['values']) for e in res['sheets'][sheetIndex]['data'][0]['rowData'] if e])
@@ -67,7 +80,7 @@ class ingredientList:
                 # Store the value of nutrians property of food with index row
                 self.nutrients_values[self.ingredient[0][i]] = 0
                 self.nutrients_values[self.ingredient[0][i]] += float(self.ingredient[self.indexFood][
-                                                                         self.nutrients_col[self.ingredient[0][i]]])
+                                                                          self.nutrients_col[self.ingredient[0][i]]])
 
             elif counter == 3:  # After the first empty column, the next columns will be dietary restriction column
                 self.dietary_restriction_col[self.ingredient[0][i]] = i
