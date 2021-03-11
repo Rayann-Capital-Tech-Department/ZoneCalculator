@@ -116,6 +116,7 @@ for i in range(len(values_input_recipe) - 1):
             recipe_restriction_dict[j] = "no"
     if values_ingredient_list[index_inputted_food[i]][dietary_restrict_col["zone-favorable"]] == "no":
         zone_Unfavorable += inputted_names[i]
+        zone_Unfavorable += ", "
 
 if total_nutrians_values["sugar"] == 0:
     sugar_free = "yes"
