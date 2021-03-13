@@ -118,7 +118,9 @@ for i in range(len(values_input_recipe) - 1):
         zone_Unfavorable += inputted_names[i]
         zone_Unfavorable += ", "
 
-if total_nutrians_values["sugar"] == 0:
+print(total_nutrians_values)
+
+if total_nutrians_values["sugar (g)"] == 0:
     sugar_free = "yes"
 else:
     sugar_free = "no"
