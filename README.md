@@ -6,7 +6,7 @@
   
    ① Calculate the amount of ingredients needed, calories, carbonhydrates, fats, protein, sodium and sugar of each food in the recipe that the users make and based on the amount of zone blocks that they want
     
-   ② Calculate the total value of each nutrians that the recipe brings to the users
+   ② Calculate the total value of each nutrients that the recipe brings to the users
     
    ③ Print out the dietary restriction fact of the recipe that the users input
   
@@ -31,7 +31,7 @@ Carrots|1|cups
 Olive oil|5|teaspoon
 
 ### Output
-The output of the zone calculations will be display in a table. The table will dispay the input foods' name, zone blocks and nutrians; the total value of nutrians for the whole recipe and the dietary restriction.
+The output of the zone calculations will be display in a table. The table will dispay the input foods' name, zone blocks and nutrients; the total value of nutrients for the whole recipe and the dietary restriction.
 
 **Sample Output**
 
