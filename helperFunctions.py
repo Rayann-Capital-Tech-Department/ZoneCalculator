@@ -10,7 +10,6 @@ def getSheetIndex(IDFiles, sheetName):
     for i in sheets:
         if i["properties"]["title"] == sheetName:
             sheetIndex = i["properties"]["index"]
-
     return sheetIndex
 
 
@@ -28,6 +27,7 @@ def getRange(IDFiles, sheetIndex):
     lastColumn = max([len(e['values']) for e in res['sheets'][sheetIndex]['data'][0]['rowData'] if e])
 
     string = ""
+    # Convert index column into string as the column inside the spreadsheet
     while lastColumn > 0:
         lastColumn, remainder = divmod(lastColumn - 1, 26)
         string = chr(65 + remainder) + string
@@ -44,8 +44,8 @@ class recipe:
 
         # Start at 1 to ignore the header row
         for i in range(1, len(self.inputRecipe)):
-            self.ingredients_blocks[self.inputRecipe[i][0]] = self.inputRecipe[i][1]
-            self.ingredients_units[self.inputRecipe[i][0]] = self.inputRecipe[i][2]
+            self.ingredients_blocks[self.inputRecipe[i][0]] = self.inputRecipe[i][3]
+            self.ingredients_units[self.inputRecipe[i][0]] = self.inputRecipe[i][4]
 
 
 # Class to store data of ingredient
@@ -62,7 +62,7 @@ class ingredientList:
         # Dictionary for storing name of each nutrition, dietary restriction value
         self.nutrients_values = {}
         self.dietary_restriction_values = {}
-        self.inputFood_nutrians_values = {}
+        self.inputFood_nutrients_values = {}
         self.nutrientsName = []
 
         # Function to get the column of each property in the first row
@@ -73,16 +73,16 @@ class ingredientList:
                 continue
             if counter == 1:  # After the first empty column, the next columns will be measurement column
                 self.measurement_col[self.ingredient[0][i]] = i
-            elif counter == 2:  # After the second empty column, the next columns will be nutrians column
+            elif counter == 2:  # After the second empty column, the next columns will be nutrients column
                 self.nutrientsName.append(self.ingredient[0][i])
                 self.nutrients_col[self.ingredient[0][i]] = i
 
-                # Store the value of nutrians property of food with index row
+                # Store the value of nutrients property of food with index row
                 self.nutrients_values[self.ingredient[0][i]] = 0
                 self.nutrients_values[self.ingredient[0][i]] += float(self.ingredient[self.indexFood][
                                                                           self.nutrients_col[self.ingredient[0][i]]])
 
-            elif counter == 3:  # After the first empty column, the next columns will be dietary restriction column
+            elif counter == 3:  # After the third empty column, the next columns will be dietary restriction column
                 self.dietary_restriction_col[self.ingredient[0][i]] = i
                 # Store the dietary restriction text into dictionary
                 self.dietary_restriction_values[self.ingredient[0][i]] = self.ingredient[self.indexFood][
@@ -92,35 +92,36 @@ class ingredientList:
 
 
 # Get the index row of the input food in the ingredient list
-def getInputIndex(inputFoodName, nutrition_info, index_inputted_food):
+def getInputIndex(inputFoodNameTagsMethod, nutrition_info, index_inputted_food):
     # Counter is the index of food in the input recipe
     counter = 0
 
-    for inputFood in inputFoodName:
+    for inputFood in inputFoodNameTagsMethod:
         for i, x in enumerate(nutrition_info):
             # If food appears in the nutrition_infor list, append the food's index row into an array to store
-            if inputFood in x:
+            if inputFood == (x[0] + x[1] + x[2]):
                 index_inputted_food.append(i)
                 counter += 1
-                if counter == len(inputFoodName):  # Break if all the inputted food checked
-                    break
+            if counter == len(inputFoodNameTagsMethod):  # Break if all the inputted food checked
+                break
+
     return index_inputted_food
 
 
-# Function to initialize value for all the total values of each nutrians appeared on the ingredient list
-def total_nutrions_values(ingredient):
-    total_nutrians_values = {}
+# Function to initialize value for all the total values of each nutrients appeared on the ingredient list
+def total_nutritions_values(ingredient):
+    total_nutrients_values = {}
     count = 0
     for i in range(len(ingredient[0])):
         # Check the index of empty column
         if ingredient[0][i] == "":
             count += 1
             continue
-        # Check if there is second empty column, if yes, the next columns will be nutrians columns
+        # Check if there is second empty column, if yes, the next columns will be nutrients columns
         if count == 2:
-            total_nutrians_values[ingredient[0][i]] = 0
+            total_nutrients_values[ingredient[0][i]] = 0
 
-    return total_nutrians_values
+    return total_nutrients_values
 
 
 # Function creates new worksheet into sheet_name worksheet with ID: outputListID
