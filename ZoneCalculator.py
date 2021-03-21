@@ -165,8 +165,6 @@ for sheet in sheets:
     for i in headerList[0]:
         if i != "Amount" and i != "Needed":
             totalNutrientsArray.append("")
-        else:
-            break
     totalNutrientsArray.append("TOTAL")
 
     for nutrition in total_nutrients_values:
