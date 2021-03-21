@@ -40,12 +40,20 @@ for sheet in sheets:
 
     # Step 3: Write the header for columns of output file
     headerList = [values_input_recipe[0][i] for i in range(0, len(values_input_recipe[0]) - 1)]
-    headerList.append("Needed")
+
+    # Check if the input is ZoneBlocks or Amount
+    zoneBlockMode = True
+    if "Amount" in headerList:
+        zoneBlockMode = False
+    else:
+        headerList.append("Needed")
+
+    # Get the header list of the input recipe
     headerList.extend(helperFunctions.ingredientList(values_ingredient_list, 2).nutrientsName)
     headerList = [headerList]
 
-    # Step 4: Append the inputted units, name of food and zone blocks into array
-    inputted_zoneblocks = helperFunctions.recipe(values_input_recipe).ingredients_blocks
+    # Step 4: Append the inputted units, name of food and zone blocks (or amount) into array
+    inputted_amount = helperFunctions.recipe(values_input_recipe).ingredients_amount_input
     inputted_units = helperFunctions.recipe(values_input_recipe).ingredients_units
 
     inputted_names = [values_input_recipe[i][0] for i in range(1, len(values_input_recipe))]
@@ -82,8 +90,11 @@ for sheet in sheets:
         # Array stores calculated results for each food
         eachFoodResult = []
         eachFoodRow = []
-        eachFoodResult.extend(
-            [inputted_names[i], inputted_tags[i], inputted_cookingM[i], inputted_zoneblocks[inputted_names[i]]])
+        if zoneBlockMode:  # If zoneblocks inputted, add column of inputted zoneblocks, otherwise no need
+            eachFoodResult.extend(
+                [inputted_names[i], inputted_tags[i], inputted_cookingM[i], inputted_amount[inputted_names[i]]])
+        else:
+            eachFoodResult.extend([inputted_names[i], inputted_tags[i], inputted_cookingM[i]])
 
         # Check the inputted unit and set the column
         units_column = 0
@@ -99,18 +110,28 @@ for sheet in sheets:
         dietary_values = helperFunctions.ingredientList(values_ingredient_list,
                                                         index_inputted_food[i]).dietary_restriction_values
         # Calculate for each property
-        if inputted_units[inputted_names[i]] == "tbsp" or inputted_units[inputted_names[i]] == "tsp":
-            needed = str(Fraction(float(inputted_zoneblocks[inputted_names[i]]) * float(units_value)).
-                         limit_denominator(10)) + " " + str(inputted_units[inputted_names[i]])
+
+        if zoneBlockMode:
+            if inputted_units[inputted_names[i]] == "tbsp" or inputted_units[inputted_names[i]] == "tsp":
+                needed = str(Fraction(float(inputted_amount[inputted_names[i]]) * float(units_value)).limit_denominator(
+                    10)) + " " + str(inputted_units[inputted_names[i]])
+            else:
+                needed = str(round(float(inputted_amount[inputted_names[i]]) * float(units_value))) + " " + str(
+                    inputted_units[inputted_names[i]])
         else:
-            needed = str(round(float(inputted_zoneblocks[inputted_names[i]]) * float(units_value))) \
-                     + " " + str(inputted_units[inputted_names[i]])
+            needed = inputted_amount[inputted_names[i]] + " " + inputted_units[inputted_names[i]]
+
         eachFoodResult.append(needed)
         # Calculate the total nutrients values for each nutrient
+
         for nutrient in nutrients_values:
-            nutrients_values[nutrient] = round(
-                nutrients_values[nutrient] * float(inputted_zoneblocks[inputted_names[i]]))
-            total_nutrients_values[nutrient] = round(total_nutrients_values[nutrient] + nutrients_values[nutrient])
+            if zoneBlockMode:
+                nutrients_values[nutrient] = round(
+                    nutrients_values[nutrient] * float(inputted_amount[inputted_names[i]]))
+                total_nutrients_values[nutrient] = round(total_nutrients_values[nutrient] + nutrients_values[nutrient])
+            else:
+                nutrients_values[nutrient] = round(
+                    float(inputted_amount[inputted_names[i]]) / float(units_value) * float(nutrients_values[nutrient]))
             eachFoodResult.append(nutrients_values[nutrient])
 
         # Append to array each food for printing out result of each food
@@ -122,7 +143,6 @@ for sheet in sheets:
             if values_ingredient_list[index_inputted_food[i]][dietary_restrict_col[j]] == "no":
                 recipe_restriction_dict[j] = "no"
         if values_ingredient_list[index_inputted_food[i]][dietary_restrict_col["zone-favorable"]] == "no":
-            print(inputted_names[i])
             if inputted_cookingM[i] != "" and inputted_tags[i] != "":
                 zone_Unfavorable.append(" - ".join([inputted_names[i], inputted_cookingM[i], inputted_tags[i]]))
             elif inputted_cookingM[i] == "" and inputted_tags[i] != "":
@@ -140,7 +160,15 @@ for sheet in sheets:
         sugar_free = "no"
 
     # Array to print out the total nutrients values
-    totalNutrientsArray = ["", "", "", "", "TOTAL"]
+    totalNutrientsArray = []
+    numberOfEmptyColumn = 0
+    for i in headerList[0]:
+        if i != "Amount" and i != "Needed":
+            totalNutrientsArray.append("")
+        else:
+            break
+    totalNutrientsArray.append("TOTAL")
+
     for nutrition in total_nutrients_values:
         totalNutrientsArray.append(str(total_nutrients_values[nutrition]))
 
