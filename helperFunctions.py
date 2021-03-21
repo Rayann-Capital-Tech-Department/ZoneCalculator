@@ -22,7 +22,6 @@ def getRange(IDFiles, sheetIndex):
                                                                                'properties(index,'
                                                                                'sheetId,'
                                                                                'title))').execute()
-    sheetName = res['sheets'][sheetIndex]['properties']['title']
     lastRow = len(res['sheets'][sheetIndex]['data'][0]['rowData'])
     lastColumn = max([len(e['values']) for e in res['sheets'][sheetIndex]['data'][0]['rowData'] if e])
 
@@ -35,16 +34,15 @@ def getRange(IDFiles, sheetIndex):
 
 
 # Store all the input information
-
 class recipe:
     def __init__(self, inputRecipe):
         self.inputRecipe = inputRecipe
-        self.ingredients_blocks = {}
+        self.ingredients_amount_input = {}
         self.ingredients_units = {}
 
         # Start at 1 to ignore the header row
         for i in range(1, len(self.inputRecipe)):
-            self.ingredients_blocks[self.inputRecipe[i][0]] = self.inputRecipe[i][3]
+            self.ingredients_amount_input[self.inputRecipe[i][0]] = self.inputRecipe[i][3]
             self.ingredients_units[self.inputRecipe[i][0]] = self.inputRecipe[i][4]
 
 
