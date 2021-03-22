@@ -34,11 +34,15 @@ Mushrooms |  | Raw | 1.5 | g
 Beef | Chuckeye  | Cooked | 5 | g
 Olive oil |  |  | 5 | tsp
 
-Name | Amount |Units
-:---: | :---: | :---:
-Potato - boiled|2|g
-Carrots|1|cups
-Olive oil|5|teaspoon
+**OR**
+
+Name | Tags | Cookind Method |Amount |Units
+:---: | :---: | :---: | :---: | :---: |
+Potato |  | Boiled | 200 | g
+Carrots |  | Cooked | 150 | g
+Mushrooms |  | Raw | 170 | g
+Beef | Chuckeye  | Cooked | 5000 | g
+Olive oil |  |  | 5 | tsp
 
 
 
