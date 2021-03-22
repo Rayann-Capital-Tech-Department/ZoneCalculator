@@ -27,7 +27,7 @@
 
 **Sample Input**
 Name | Tags | Cookind Method |Zone Blocks |Units
-:---: | :---: | :---:
+:---: | :---: | :---: | :---: | :---: |
 Potato |  | Boiled | 2 | g
 Carrots |  | Cooked | 1.5 | g
 Mushrooms |  | Raw | 1.5 | g
