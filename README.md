@@ -15,7 +15,7 @@
 ### Input
 **Instruction**
 
-  - The input is a table with 3 columns, including:
+  - The input is a table with 5 columns, including:
  
     + Name of Food: The first character of the food is capitalized (it needs to be exact the same as the name of food in the ingredients data files)
     + Tags
@@ -48,7 +48,7 @@ Olive oil |  |  | 5 | tsp
 
 
 ### Output
-The output of the zone calculations will be display in a table. The table will dispay the input foods' name, zone blocks and nutrients; the total value of nutrients for the whole recipe and the dietary restriction.
+The output of the zone calculations will be display in a table as below
 
 **Sample Output**
 
@@ -57,3 +57,11 @@ Name | Tags | Cookind Method | Zone Blocks | Needed | Calories | Carbonhydrates 
 Potato |  | Boiled |2 |150 g|88|18|0|4|16|0
 Carrots |  | Cooked | 1.5 |1 cup|38|9|0|1|65|4
 Olive oil |  |  | 5 |5/3 tsp|66|0|8|0|0|0
+
+**OR**
+
+Name | Tags | Cookind Method | Amount | Calories | Carbonhydrates | fats | protein | sodium |sugar
+:---: | :---: | :---:| :---: | :---:| :---: | :---:| :---: | :---:| :---: | :---: |
+Potato |  | Boiled |200 g|117|24|0|5|21|0
+Carrots |  | Cooked | 150 g|38|8|0|0|0|0
+Olive oil |  |  | 5 tsp |198|0|24|0|0|0
