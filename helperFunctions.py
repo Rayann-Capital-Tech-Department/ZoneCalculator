@@ -41,9 +41,15 @@ class recipe:
         self.ingredients_units = {}
 
         # Start at 1 to ignore the header row
+
         for i in range(1, len(self.inputRecipe)):
-            self.ingredients_amount_input[self.inputRecipe[i][0]] = self.inputRecipe[i][3]
-            self.ingredients_units[self.inputRecipe[i][0]] = self.inputRecipe[i][4]
+            if len(self.inputRecipe[i]) < 5:
+                print("in")
+                self.ingredients_amount_input[self.inputRecipe[i][0]] = 0
+                self.ingredients_units[self.inputRecipe[i][0]] = ""
+            else:
+                self.ingredients_amount_input[self.inputRecipe[i][0]] = self.inputRecipe[i][3]
+                self.ingredients_units[self.inputRecipe[i][0]] = self.inputRecipe[i][4]
 
 
 # Class to store data of ingredient
@@ -77,8 +83,8 @@ class ingredientList:
 
                 # Store the value of nutrients property of food with index row
                 self.nutrients_values[self.ingredient[0][i]] = 0
-                self.nutrients_values[self.ingredient[0][i]] += float(self.ingredient[self.indexFood][
-                                                                          self.nutrients_col[self.ingredient[0][i]]])
+                self.nutrients_values[self.ingredient[0][i]] += float(
+                    self.ingredient[self.indexFood][self.nutrients_col[self.ingredient[0][i]]])
 
             elif counter == 3:  # After the third empty column, the next columns will be dietary restriction column
                 self.dietary_restriction_col[self.ingredient[0][i]] = i
@@ -92,16 +98,30 @@ class ingredientList:
 # Get the index row of the input food in the ingredient list
 def getInputIndex(inputFoodNameTagsMethod, nutrition_info, index_inputted_food):
     # Counter is the index of food in the input recipe
-    counter = 0
-
-    for inputFood in inputFoodNameTagsMethod:
-        for i, x in enumerate(nutrition_info):
-            # If food appears in the nutrition_infor list, append the food's index row into an array to store
-            if inputFood == (x[0] + x[1] + x[2]):
-                index_inputted_food.append(i)
-                counter += 1
-            if counter == len(inputFoodNameTagsMethod):  # Break if all the inputted food checked
-                break
+    for m in range(len(inputFoodNameTagsMethod)):
+        # Array stores foods with the same name but have different tags
+        sameNameDifTag = []
+        i = 0
+        while i < len(nutrition_info):
+            # If food appears in the nutrition_infor list, append the food's index row into an array to store+
+            if inputFoodNameTagsMethod[m][0] == nutrition_info[i][0]:  # Check if the name of the input food matched
+                # with the one in the ingredient list
+                if (inputFoodNameTagsMethod[m][1] == nutrition_info[i][1] and inputFoodNameTagsMethod[m][1] != "") or (
+                        inputFoodNameTagsMethod[m][2] == nutrition_info[i][2] and inputFoodNameTagsMethod[m][2] != ""):
+                    index_inputted_food.append(i)
+                    break
+                else:
+                    if i + 1 < len(nutrition_info): # If not the last name to check on the nutrition list
+                        sameNameDifTag.append(i)
+                        i += 1
+                    else: # If yes, simply append it to the index inputted food
+                        index_inputted_food.append(i)
+                        break
+            else:
+                if len(sameNameDifTag) > 0: # If the food has alrady been met => simply get the first name on the list
+                    index_inputted_food.append(sameNameDifTag[0])
+                    break
+                i += 1 # else just increase 1 index
 
     return index_inputted_food
 
